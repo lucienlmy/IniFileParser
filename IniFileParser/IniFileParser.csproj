@@ -23,9 +23,9 @@ The SetSetting() method is overloaded to accept different value types. The GetSe
     <RepositoryType>git</RepositoryType>
     <PackageTags>ini ini-file inifile parser ini-parser parse parsing</PackageTags>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <Version>3.1.0</Version>
+    <Version>3.1.1</Version>
     <AssemblyVersion></AssemblyVersion>
-    <PackageReleaseNotes>Added TrimValues property; Minor fixes and tweaks.</PackageReleaseNotes>
+    <PackageReleaseNotes>Corrected issue where sections with the same name were not combined; Minor fixes and tweaks.</PackageReleaseNotes>
     <FileVersion></FileVersion>
     <PackageIcon>Logo_64x64.png</PackageIcon>
     <PackageIconUrl />

@@ -210,7 +210,6 @@ namespace IniParser.Tests
             ("iBJOskHHDX", "      DazniZGfot      "),
         ];
 
-
         [TestMethod]
         public void TestTrimValues()
         {
@@ -361,6 +360,97 @@ namespace IniParser.Tests
             {
                 Assert.AreEqual(DateTimeValues[j].Name, settings[j + i].Name);
                 Assert.AreEqual(DateTimeValues[j].Value, DateTime.ParseExact(settings[j + i].Value, IniFile.DefaultDateTimeFormat, null));
+            }
+        }
+
+        [TestMethod]
+        public void TestSameSectionNamesAreCombined()
+        {
+            string contents = """
+                [Section1]
+                test1=1
+                test2=2
+                test3=3
+
+                [Section2]
+                test1=1
+                test2=2
+                test3=3
+
+                [Section3]
+                test1=1
+                test2=2
+                test3=3
+
+                [Section1]
+                test4=4
+                test5=5
+                test6=6
+
+                [Section2]
+                test4=4
+                test5=5
+                test6=6
+
+                [Section3]
+                test4=4
+                test5=5
+                test6=6
+
+                [Section1]
+                test7=7
+                test8=8
+                test9=9
+
+                [Section2]
+                test7=7
+                test8=8
+                test9=9
+
+                [Section3]
+                test7=7
+                test8=8
+                test9=9
+                """;
+
+            IniFile file = new();
+            LoadFromBytes(file, SaveToBytes(contents));
+            var sections = file.GetSections();
+
+            Assert.AreEqual(3, sections.Count());
+
+            foreach (var section in sections)
+            {
+                Assert.AreEqual(9, file.GetSectionSettings(section).Count());
+            }
+        }
+
+        [TestMethod]
+        public void TestDuplicateSettingNameOverridesPreviousValue()
+        {
+            string contents = """
+                [General]
+                test1=1
+                test2=2
+                test3=3
+                test1=4
+                test2=5
+                test3=6
+                test1=7
+                test2=8
+                test3=9
+                """;
+
+            IniFile file = new();
+            LoadFromBytes(file, SaveToBytes(contents));
+            var sections = file.GetSections();
+
+            Assert.AreEqual(1, sections.Count());
+
+            for (int i = 1; i <= 3; i++)
+            {
+                var setting = file.GetSetting("General", $"test{i}");
+                Assert.AreEqual($"{6 + i}", setting);
             }
         }
 

@@ -329,9 +329,10 @@ namespace SoftCircuits.IniFileParser
 #else
                     string name = line.Substring(start, pos - start);
 #endif
-                    // Add section if it doesn't already exist
-                    if (!Sections.ContainsKey(name))
+                    // Get section if it already exists
+                    if (!Sections.TryGetValue(name, out section))
                     {
+                        // Otherwise, add section
                         section = new IniSection(name, StringComparer);
                         Sections.Add(section.Name, section);
                     }
