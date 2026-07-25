@@ -6,10 +6,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SoftCircuits.IniFileParser;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
-using static System.Collections.Specialized.BitVector32;
 
 [assembly: Parallelize]
 
@@ -127,12 +125,12 @@ namespace IniParser.Tests
                 foreach ((string Name, DateTime Value) in DateTimeValues)
                     file.SetSetting(section, Name, Value);
             }
-            byte[] buffer = SaveToBytes(file);
+            byte[] buffer = file.SaveToBytes();
 
             file.Clear();
             Assert.AreEqual(0, file.GetSections().Count());
 
-            LoadFromBytes(file, buffer);
+            file.LoadFromBytes(buffer);
             Assert.AreEqual(Sections.Length, file.GetSections().Count());
             foreach (string section in Sections)
             {
@@ -175,10 +173,9 @@ namespace IniParser.Tests
                 foreach ((string Name, DateTime Value) in DateTimeValues)
                     builder.AppendLine($"{spaces}{Name}{spaces}={Value.ToString(IniFile.DefaultDateTimeFormat)}");
             }
-            byte[] buffer = SaveToBytes(builder.ToString());
 
             IniFile file = new();
-            LoadFromBytes(file, buffer);
+            file.LoadFromString(builder.ToString());
             Assert.AreEqual(Sections.Length, file.GetSections().Count());
             foreach (string section in Sections)
             {
@@ -218,12 +215,12 @@ namespace IniParser.Tests
             foreach ((string Name, string Value) in StringValuesWithWhitespace)
                 file.SetSetting(IniFile.DefaultSectionName, Name, Value);
 
-            byte[] buffer = SaveToBytes(file);
+            byte[] buffer = file.SaveToBytes();
 
             file.Clear();
             Assert.AreEqual(0, file.GetSections().Count());
 
-            LoadFromBytes(file, buffer);
+            file.LoadFromBytes(buffer);
             foreach ((string Name, string Value) in StringValuesWithWhitespace)
             {
                 Assert.AreEqual(Value, file.GetSetting(IniFile.DefaultSectionName, Name, string.Empty));
@@ -232,7 +229,7 @@ namespace IniParser.Tests
             }
 
             file.TrimValues = true;
-            LoadFromBytes(file, buffer);
+            file.LoadFromBytes(buffer);
             foreach ((string Name, string Value) in StringValuesWithWhitespace)
             {
                 Assert.AreEqual(Value.Trim(), file.GetSetting(IniFile.DefaultSectionName, Name, string.Empty));
@@ -260,12 +257,12 @@ namespace IniParser.Tests
                 foreach ((string Name, DateTime Value) in DateTimeValues)
                     file.SetSetting(section, Name, Value);
             }
-            byte[] buffer = SaveToBytes(file);
+            byte[] buffer = file.SaveToBytes();
 
             file.Clear();
             Assert.AreEqual(0, file.GetSections().Count());
 
-            LoadFromBytes(file, buffer);
+            file.LoadFromBytes(buffer);
             Assert.AreEqual(Sections.Length, file.GetSections().Count());
             foreach (string section in Sections)
             {
@@ -321,12 +318,12 @@ namespace IniParser.Tests
                 foreach ((string Name, DateTime Value) in DateTimeValues)
                     file.SetSetting(section, Name, Value);
             }
-            byte[] buffer = SaveToBytes(file);
+            byte[] buffer = file.SaveToBytes();
 
             file.Clear();
             Assert.AreEqual(0, file.GetSections().Count());
 
-            LoadFromBytes(file, buffer);
+            file.LoadFromBytes(buffer);
             Assert.AreEqual(Sections.Length, file.GetSections().Count());
             var settings = file.GetSectionSettings(Sections[0]).ToArray();
             Assert.AreEqual(TotalItems, settings.Length);
@@ -414,7 +411,7 @@ namespace IniParser.Tests
                 """;
 
             IniFile file = new();
-            LoadFromBytes(file, SaveToBytes(contents));
+            file.LoadFromString(contents);
             var sections = file.GetSections();
 
             Assert.AreEqual(3, sections.Count());
@@ -442,7 +439,7 @@ namespace IniParser.Tests
                 """;
 
             IniFile file = new();
-            LoadFromBytes(file, SaveToBytes(contents));
+            file.LoadFromString(contents);
             var sections = file.GetSections();
 
             Assert.AreEqual(1, sections.Count());
@@ -473,7 +470,6 @@ namespace IniParser.Tests
                 #c=2
                 @d=3
                 """;
-            byte[] contentBytes = SaveToBytes(contents);
 
             foreach (var (c, keys) in comments)
             {
@@ -481,7 +477,7 @@ namespace IniParser.Tests
 
                 if (c != '\0')
                     file.CommentCharacter = c;
-                LoadFromBytes(file, contentBytes);
+                file.LoadFromString(contents);
                 var settings = file.GetSectionSettings(IniFile.DefaultSectionName);
                 CollectionAssert.AreEqual(keys, settings.Select(s => s.Name).ToList());
             }
@@ -532,11 +528,11 @@ namespace IniParser.Tests
             // Write as bool values
             foreach ((string Setting, string _, bool Value, bool _) in BoolOptionData)
                 file.SetSetting(boolSection, Setting, Value);
-            byte[] buffer = SaveToBytes(file);
+            byte[] buffer = file.SaveToBytes();
 
             file.Clear();
             Assert.AreEqual(0, file.GetSections().Count());
-            LoadFromBytes(file, buffer);
+            file.LoadFromBytes(buffer);
 
             foreach ((string Setting, string _, bool Value, bool CanRead) in BoolOptionData)
             {
@@ -566,10 +562,10 @@ namespace IniParser.Tests
 
             file.SetSetting(IniFile.DefaultSectionName, "Test", "Abc");
             file.SetSetting(IniFile.DefaultSectionName, "Test2", "123");
-            byte[] buffer = SaveToBytes(file);
+            byte[] buffer = file.SaveToBytes();
 
             file.Clear();
-            LoadFromBytes(file, buffer);
+            file.LoadFromBytes(buffer);
 
             Assert.AreEqual(@$"{file.CommentCharacter}Abc
 {file.CommentCharacter}123
@@ -603,17 +599,17 @@ Test2=123
                     file.SetSetting($"Section{i + 1}", $"Setting{j + 1}", $"Value{j + 1}");
                 }
             }
-            byte[] buffer = SaveToBytes(file);
+            byte[] buffer = file.SaveToBytes();
 
             file.Clear();
-            LoadFromBytes(file, buffer);
+            file.LoadFromBytes(buffer);
 
             Assert.IsTrue(file.DeleteSection("Section2"));
             Assert.IsTrue(file.DeleteSetting("Section3", "Setting3"));
-            buffer = SaveToBytes(file);
+            buffer = file.SaveToBytes();
 
             file.Clear();
-            LoadFromBytes(file, buffer);
+            file.LoadFromBytes(buffer);
 
             var sectionSettings = file.GetSectionSettings("Section1");
             Assert.AreEqual(5, sectionSettings.Count());
@@ -624,35 +620,5 @@ Test2=123
             Assert.IsNotNull(file.GetSetting("Section3", "Setting2"));
             Assert.IsNull(file.GetSetting("Section3", "Setting3"));
         }
-
-        #region Memory save/load
-
-        private static byte[] SaveToBytes(IniFile file)
-        {
-            using MemoryStream stream = new();
-            using StreamWriter writer = new(stream);
-            file.Save(writer);
-            writer.Flush();
-            return stream.ToArray();
-        }
-
-        private static byte[] SaveToBytes(string contents)
-        {
-            using MemoryStream stream = new();
-            using StreamWriter writer = new(stream);
-            writer.Write(contents);
-            writer.Flush();
-            return stream.ToArray();
-        }
-
-        private static void LoadFromBytes(IniFile file, byte[] buffer)
-        {
-            using MemoryStream stream = new(buffer);
-            using StreamReader reader = new(stream);
-            file.Load(reader);
-        }
-
-        #endregion
-
     }
 }
