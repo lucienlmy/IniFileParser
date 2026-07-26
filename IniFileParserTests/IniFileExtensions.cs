@@ -3,10 +3,9 @@
 //
 
 using SoftCircuits.IniFileParser;
-using System.IO;
 using System.Text;
 
-namespace IniParser.Tests
+namespace IniFileParserTests
 {
     public static class IniFileExtensions
     {

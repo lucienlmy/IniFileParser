@@ -23,9 +23,9 @@ The SetSetting() method is overloaded to accept different value types. The GetSe
     <RepositoryType>git</RepositoryType>
     <PackageTags>ini ini-file inifile parser ini-parser parse parsing</PackageTags>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <Version>3.1.1</Version>
+    <Version>3.1.2</Version>
     <AssemblyVersion></AssemblyVersion>
-    <PackageReleaseNotes>Corrected issue where sections with the same name were not combined; Minor fixes and tweaks.</PackageReleaseNotes>
+    <PackageReleaseNotes>Complete code review and clean up; Moves unit tests to xUnit.</PackageReleaseNotes>
     <FileVersion></FileVersion>
     <PackageIcon>Logo_64x64.png</PackageIcon>
     <PackageIconUrl />
